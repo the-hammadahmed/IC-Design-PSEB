@@ -60,12 +60,12 @@ Word-addressed, `PADDR[7:2]` selects the register:
 
 Requires [Icarus Verilog](https://github.com/steveicarus/iverilog.git).
 
-**Phase 1 — AXI master/slave protocol test:**
+**Phase 1: AXI master/slave protocol test:**
 ```bash
 iverilog -o sim_axi_full axi_full_master.v axi_full_slave.v tb_axi_full.v; vvp sim_axi_full
 ```
 
-**Phase 2 — full DMA test:**
+**Phase 2: full DMA test:**
 ```bash
 iverilog -o sim_dma_axi axi_full_master.v axi_full_slave.v sync_fifo.v dma_controller.v dma_axi_top.v tb_dma_axi_top.v; vvp sim_dma_axi
 ```
