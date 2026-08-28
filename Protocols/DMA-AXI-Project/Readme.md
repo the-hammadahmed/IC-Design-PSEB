@@ -52,26 +52,22 @@ Word-addressed, `PADDR[7:2]` selects the register:
 | `0x14` | `STATUS` | R | bit0 = `BUSY`, bit1 = `DONE`, bit2 = `ERROR` |
 
 > **Note:** `BURST_SIZE` here is the number of AXI beats per burst (1–16), not
-> a per-beat transfer width — the data path is a fixed 32-bit (4-byte) word
+> a per-beat transfer width, the data path is a fixed 32-bit (4-byte) word
 > throughout. True sub-word (8/16-bit) transfers via `WSTRB`/`AxSIZE` are a
 > straightforward follow-on left out of this version to keep it verifiable.
 
 ## Building and running the tests
 
-Requires [Icarus Verilog](http://iverilog.icarus.com/).
+Requires [Icarus Verilog](https://github.com/steveicarus/iverilog.git).
 
 **Phase 1 — AXI master/slave protocol test:**
 ```bash
-cd src
-iverilog -o sim_axi_full axi_full_master.v axi_full_slave.v tb_axi_full.v
-vvp sim_axi_full
+iverilog -o sim_axi_full axi_full_master.v axi_full_slave.v tb_axi_full.v; vvp sim_axi_full
 ```
 
-**Phase 2 — full DMA system test:**
+**Phase 2 — full DMA test:**
 ```bash
-cd src
-iverilog -o sim_dma_axi axi_full_master.v axi_full_slave.v sync_fifo.v dma_controller.v dma_axi_top.v tb_dma_axi_top.v
-vvp sim_dma_axi
+iverilog -o sim_dma_axi axi_full_master.v axi_full_slave.v sync_fifo.v dma_controller.v dma_axi_top.v tb_dma_axi_top.v; vvp sim_dma_axi
 ```
 
 Both testbenches dump a `.vcd` waveform (`tb_axi_full.vcd`, `tb_dma_axi_top.vcd`)
@@ -79,11 +75,11 @@ that can be viewed with [GTKWave](http://gtkwave.sourceforge.net/) or similar.
 
 ## Test results
 
-**Phase 1** — burst lengths 1, 4, and 16 all match expected data beat-for-beat:
+**Phase 1** - burst lengths 1, 4, 16 all matched beat-for-beat:
 
 ![AXI full master/slave waveform](images/tb_axi_full.png)
 
-**Phase 2** — a 16-word transfer (4 whole bursts of 4) and a 10-word transfer
+**Phase 2** - 16 word transfer (4 whole bursts of 4) and a 10 word transfer
 (2 whole bursts + 1 partial burst of 2) both complete with `STATUS.DONE=1`,
 `STATUS.ERROR=0`, and destination memory matching the source pattern:
 
@@ -116,12 +112,10 @@ Transfer src=00002000 dst=00003000 len=10 burst=4 -> status=010 (busy,done,error
 
 ## Known simplifications
 
-- Single fixed AXI ID per master/slave — trivially in-order, no ID-based
-  reordering.
+- Single fixed AXI ID per master/slave - trivially in order, no ID based reordering.
 - `AWSIZE`/`ARSIZE` fixed at 4 bytes (32-bit data width throughout).
-- `AWBURST`/`ARBURST` fixed at INCR — the only burst type required by the
-  project spec.
+- `AWBURST`/`ARBURST` fixed at INCR - the only burst type required by the project spec.
 - `WSTRB` passed through from the producer rather than generated internally.
 - One outstanding transaction (read or write) at a time on both the master
-  and slave — no interconnect/arbitration is needed since there's exactly
+  and slave - no interconnect/arbitration is needed since there's exactly
   one master and one slave.
