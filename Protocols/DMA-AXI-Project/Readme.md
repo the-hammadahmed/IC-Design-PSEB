@@ -83,15 +83,25 @@ that can be viewed with [GTKWave](http://gtkwave.sourceforge.net/) or similar.
 (2 whole bursts + 1 partial burst of 2) both complete with `STATUS.DONE=1`,
 `STATUS.ERROR=0`, and destination memory matching the source pattern:
 
-![DMA + AXI system waveform](images/tb_dma_axi_top.png)
+![DMA + AXI waveform](images/tb_dma_axi_top.png)
 
 ```
-== Transfer 1: 16 words, burst=4 (4 whole bursts) ==
-Transfer src=00000000 dst=00001000 len=16 burst=4 -> status=010 (busy,done,error)
-== Transfer 2: 10 words, burst=4 (2 whole + 1 partial burst of 2) ==
-Transfer src=00002000 dst=00003000 len=10 burst=4 -> status=010 (busy,done,error)
-==== ALL SYSTEM TESTS PASSED ====
+Transfer 1: 16 words, burst=4 (4 whole bursts)
+Transfer src = [00000000] to dst = [00001000] len = 16 burst = 4 -> status = 010 {busy,done,error}
+
+Transfer 2: 10 words, burst=4 (2 whole + 1 partial burst of 2)
+Transfer src = [00002000] to dst = [00003000] len = 10 burst = 4 -> status = 010 {busy,done,error}
+
+ALL TESTS PASSED
 ```
+
+I also wanted to actually *see* the copy happen rather than just trust the
+status register, so `tb_DMA_Copy_Check.v` writes a known pattern into the
+source region, runs the DMA, and prints both sides plus compare them word by word:
+
+![DMA + AXI Copy Check](images/tb_dma_copy_check.png)
+
+
 
 ## Repository layout
 
@@ -105,7 +115,10 @@ Transfer src=00002000 dst=00003000 len=10 burst=4 -> status=010 (busy,done,error
 │   ├── sync_fifo.v
 │   ├── tb_axi_full.v
 │   └── tb_dma_axi_top.v
+|   └── tb_DMA_Copy_Check.v
 └── images/
+    ├── tb_dma_copy_wave.png
+    ├── tb_dma_copy_check.png
     ├── tb_axi_full.png
     └── tb_dma_axi_top.png
 ```
